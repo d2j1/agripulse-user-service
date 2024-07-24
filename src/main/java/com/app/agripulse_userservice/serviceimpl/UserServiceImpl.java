@@ -3,66 +3,85 @@ package com.app.agripulse_userservice.serviceimpl;
 import com.app.agripulse_userservice.dtos.ConfirmationDto;
 import com.app.agripulse_userservice.dtos.PasswordDto;
 import com.app.agripulse_userservice.dtos.UserDto;
+import com.app.agripulse_userservice.exceptions.IncorrectPassswordException;
 import com.app.agripulse_userservice.exceptions.UserNotFoundException;
-import com.app.agripulse_userservice.models.User;
+import com.app.agripulse_userservice.models.UserModel;
 import com.app.agripulse_userservice.repository.UserRepository;
 import com.app.agripulse_userservice.service.UserService;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
+
+
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<UserModel> user = userRepository.findByEmail(username);
+        if (user.isEmpty()) {
+            throw new UsernameNotFoundException("User not found with email: " + username);
+        }
+        return user.get();
+    }
+
 
     @Override
     public UserDto getUserById(Long id) {
-        Optional<User> userOptional = userRepository.findById(id);
+        Optional<UserModel> userOptional = userRepository.findById(id);
         if (userOptional.isPresent()) {
-            User user = userOptional.get();
+            UserModel user = userOptional.get();
 
             UserDto userDto = new UserDto();
-            userDto.setUsername(user.getUsername());
-            userDto.setEmail(user.getEmail());
+            userDto.setEmail(user.getUsername());
+            userDto.setEmail(user.getUsername());
 
+            System.out.println("user mail id is "+user.getEmail());
             return userDto;
         }else{
             throw new UserNotFoundException("User not found");
         }
     }
 
-
-
     @Override
     public UserDto createUser(UserDto userDto) {
 
-        User user = new User();
+        UserModel user = new UserModel();
         user.setName(userDto.getName());
-        user.setUsername(userDto.getUsername());
-        user.setPassword(userDto.getPassword());
+        user.setEmail(userDto.getEmail());
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setEmail(userDto.getEmail());
 
-        User savedUser = userRepository.save(user);
+        UserModel savedUser = userRepository.save(user);
         return UserDto.fromUser(savedUser);
 
     }
 
     @Override
     public ConfirmationDto updateUserPassword(PasswordDto passwordDto) {
-       Optional<User>  userToUpdateOptional = userRepository.findById(passwordDto.getId());
+       Optional<UserModel>  userToUpdateOptional = userRepository.findById(passwordDto.getId());
 
-       User userToUpdate = userToUpdateOptional.orElse(null);
+       UserModel userToUpdate = userToUpdateOptional.orElse(null);
 
        if( userToUpdate != null ) {
-           userToUpdate.setPassword(passwordDto.getPassword());
-           User updatedUser = userRepository.save(userToUpdate);
+           userToUpdate.setPassword( passwordEncoder.encode( passwordDto.getPassword()));
+           UserModel updatedUser = userRepository.save(userToUpdate);
            return new ConfirmationDto(updatedUser.getId(), "Password Updated Successfully");
        }else{
             throw new UserNotFoundException("User not found");
@@ -81,7 +100,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getAllUsers() {
-        List<User> users = userRepository.findAll();
+        List<UserModel> users = userRepository.findAll();
 
         if( users.isEmpty() ){
             throw new UserNotFoundException("User not found");
@@ -89,7 +108,7 @@ public class UserServiceImpl implements UserService {
 
         List<UserDto> usersDtos = new ArrayList<>();
 
-        for( User user : users ){
+        for( UserModel user : users ){
             usersDtos.add(UserDto.fromUser(user));
         }
         return usersDtos;
@@ -98,24 +117,55 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateUser(Long id, UserDto userDto) {
 
-        Optional<User> fetchedUserOptional = userRepository.findById(id);
+        Optional<UserModel> fetchedUserOptional = userRepository.findById(id);
 
         if(fetchedUserOptional.isPresent()){
-            User fetchedUser = fetchedUserOptional.get();
+            UserModel fetchedUser = fetchedUserOptional.get();
 
             fetchedUser.setName(userDto.getName());
             fetchedUser.setEmail(userDto.getEmail());
-            fetchedUser.setUsername(userDto.getUsername());
-            User updatedUser = userRepository.save(fetchedUser);
+            fetchedUser.setEmail(userDto.getEmail());
+            UserModel updatedUser = userRepository.save(fetchedUser);
 
             UserDto updatedUserDto = new UserDto();
-            updatedUserDto.setUsername(updatedUser.getUsername());
-            updatedUserDto.setEmail(updatedUser.getEmail());
+            updatedUserDto.setEmail(updatedUser.getUsername());
+            updatedUserDto.setEmail(updatedUser.getUsername());
             updatedUserDto.setName(updatedUser.getName());
             return updatedUserDto;
 
         }else {
             throw new UserNotFoundException("User not found");
         }
+    }
+
+    @Override
+    public UserDto login(PasswordDto passwordDto) {
+        Optional<UserModel> userOptional = userRepository.findByEmail(passwordDto.getEmail());
+
+        if (userOptional.isPresent()) {
+            UserModel user = userOptional.get();
+            if (passwordEncoder.matches(passwordDto.getPassword(), user.getPassword())) {
+                return UserDto.fromUser(user);
+            } else {
+                throw new IncorrectPassswordException("Password is incorrect");
+            }
+        } else {
+            throw new UserNotFoundException("User not found");
+        }
+    }
+
+
+
+    public Optional<UserModel> getUserByEmail(String email) {
+        Optional<UserModel> userOptional = userRepository.findByEmail(email);
+
+        if( userOptional.isEmpty()){
+            throw new UserNotFoundException("User not found");
+        }else{
+            UserModel user = userOptional.get();
+            user.setPassword(null);
+            return Optional.of(user);
+        }
+
     }
 }

@@ -28,5 +28,15 @@ public abstract class BaseModel {
     @Column(name = "updated_date", nullable= false)
     private Date updateDate;
 
+    @PrePersist
+    protected void onCreate() {
+        createDate = new Date();
+        updateDate = new Date();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updateDate = new Date();
+    }
 
 }
