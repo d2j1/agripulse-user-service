@@ -58,12 +58,12 @@ integrating with other microservices to provide a cohesive user experience withi
     ```
     Make sure to add your database username and password in above properties.
    
-4. **Build and Run the Application:**
+3. **Build and Run the Application:**
     ```sh
     mvn clean install
     mvn spring-boot:run
     ```
-5. Use Postman or a similar tool to interact with the services.
+4. Use Postman or a similar tool to interact with the services.
 
    
 ## API Endpoints
@@ -94,14 +94,10 @@ integrating with other microservices to provide a cohesive user experience withi
   - `DELETE /users/{id}`
   - Deletes a user from the system.
 
+## Integration with Other Services
 
-
-## Technologies Used
-
-- Java, Spring Boot, Spring Security
-- Spring Data JPA, MySQL
-- JUnit, Mockito
-- Maven, IntelliJ IDEA, Postman
+`UserService` integrates with the `ContentService` to manage posts and comments related to users.
+It ensures that only authorized users can perform certain operations based on their roles.
 
 ## Contributing
 We'd like to hear from you about contributions to improve Agripulse. Please fork the repositories and submit pull requests with detailed explanations of your changes.
