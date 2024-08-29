@@ -56,7 +56,7 @@ integrating with other microservices to provide a cohesive user experience withi
     spring.jpa.hibernate.ddl-auto=update
     spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL5Dialect
     ```
-    Make sure to add your database username and password in above properties.
+    Make sure to add your database username and password in the above properties.
    
 3. **Build and Run the Application:**
     ```sh
@@ -100,9 +100,9 @@ integrating with other microservices to provide a cohesive user experience withi
 It ensures that only authorized users can perform certain operations based on their roles.
 
 ## Contributing
-We'd like to hear from you about contributions to improve Agripulse. Please fork the repositories and submit pull requests with detailed explanations of your changes.
+We'd like to hear from you about your contributions to improving Agripulse. Please fork the repositories and submit pull requests with detailed explanations of your changes.
 
 ## Contact
-For any questions or suggestions, please open an issue in the respective repositories or contact me at [dhananjayjadhav2151@gmail.com].
+Please open an issue in the respective repositories or contact me at [dhananjayjadhav2151@gmail.com] for any questions or suggestions.
 
 Thank You!
