@@ -1,6 +1,7 @@
 package com.app.agripulse_userservice.models;
 
-
+import com.app.agripulse_userservice.models.BaseModel;
+import com.app.agripulse_userservice.models.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,8 +22,9 @@ import java.util.List;
 public class UserModel extends BaseModel implements UserDetails {
 
     private String name;
+    private String countryCode;
+    private String mobileNo;
     private String email;
-    private String password;
 
     @ManyToMany
     @JoinTable(
@@ -39,26 +41,31 @@ public class UserModel extends BaseModel implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return mobileNo;
+    }
+
+    @Override
+    public String getPassword() {
+        return null;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
+        return true; // Account is always non-expired
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
+        return true; // Account is always non-locked
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return UserDetails.super.isCredentialsNonExpired();
+        return true; // No credentials to expire
     }
 
     @Override
     public boolean isEnabled() {
-        return UserDetails.super.isEnabled();
+        return true; // Enable account by default
     }
 }

@@ -11,13 +11,18 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
-    UserDto getUserById(Long id);
+
     UserDto createUser(UserDto userDto);
-    ConfirmationDto updateUserPassword(PasswordDto passwordDto);
-    void deleteUser(Long id);
-    List<UserDto> getAllUsers();
-    UserDto updateUser(Long id, UserDto userDto);
-    UserDto login(PasswordDto passwordDto);
-    Optional<UserModel> getUserByEmail(String email);
-    UserDetails loadUserByUsername(String email);
+    UserDto getUserByMobileNo(String mobileNo);
+
+
+//    UserDto getUserById(Long id);
+//    UserDto createUser(UserDto userDto);
+//    ConfirmationDto updateUserPassword(PasswordDto passwordDto);
+//    void deleteUser(Long id);
+//    List<UserDto> getAllUsers();
+//    UserDto updateUser(Long id, UserDto userDto);
+//    UserDto login(PasswordDto passwordDto);
+//    Optional<UserModel> getUserByEmail(String email);
+//    UserDetails loadUserByUsername(String email);
 }

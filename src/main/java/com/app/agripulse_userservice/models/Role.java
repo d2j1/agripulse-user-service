@@ -20,5 +20,4 @@ public class Role extends BaseModel implements GrantedAuthority {
         return name;
     }
 
-    // Getters and setters
 }
